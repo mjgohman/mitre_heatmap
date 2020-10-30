@@ -1,0 +1,448 @@
+<form>
+  <label>Notable Event Details</label>
+  <search id="notable_events">
+    <query>index IN(notable risk)
+| lookup mitre_all_technique_lookup_results.csv rule_name AS search_name
+| rex field=mitre_technique "^(?&lt;technique_id&gt;\S+)"
+| lookup mitre_tt_lookup.csv technique_id
+| eval device = coalesce(dest_host, dest, dvc_dns, dest_ip, src)
+| rex field=file_path "(?&lt;app_1&gt;[^\\\/]+)$$"
+| rex field=child_fullpath "(?&lt;app_2&gt;[^\\\/]+)$$"
+| rex field=parent_fullpath "(?&lt;app_3&gt;[^\\\/]+)$$"
+| eval application = coalesce(app, app_1, app_2, app_3)</query>
+    <earliest>$time.earliest$</earliest>
+    <latest>$time.latest$</latest>
+  </search>
+  <fieldset submitButton="false">
+    <input type="time" token="time" searchWhenChanged="true">
+      <label>Time Picker</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <title>Technique Overview</title>
+        <search base="notable_events">
+          <query>| fillnull value="" tactic_name search_name user application destination
+| stats dc(technique_name) values(search_name) values(technique_name) by tactic_name
+| rename values(*) as * dc(*) as dc_*
+| transpose 0 header_field=tactic_name
+| table column "Initial Access" "Initial Access" Execution Persistence "Privilege Escalation" "Defense Evasion" "Credential Access" Discovery "Lateral Movement" Collection "Command And Control" Exfiltration Impact</query>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color">
+          <colorPalette type="minMidMax" maxColor="#FF3333" minColor="#FFFFFF"></colorPalette>
+          <scale type="minMidMax"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Techniques Detected</title>
+        <search base="notable_events">
+          <query>
+| fillnull value="" tactic_name search_name user application destination
+| stats count by tactic_name
+| rename values(*) as * dc(*) as dc_*
+| transpose 0 header_field=tactic_name
+| table column "Initial Access" "Initial Access" Execution Persistence "Privilege Escalation" "Defense Evasion" "Credential Access" Discovery "Lateral Movement" Collection "Command and Control" Exfiltration Impact</query>
+        </search>
+        <option name="dataOverlayMode">heatmap</option>
+        <option name="drilldown">none</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Initial Access</title>
+      <table>
+        <search base="notable_events">
+          <query>
+| fillnull value="" tactic_name search_name user application destination device
+| stats count values(search_name) dc(user) dc(device) dc(application)  by tactic_name
+| search tactic_name = "Initial Access"
+| rename values(*) as * dc(*) as dc_*
+| transpose 0 header_field=tactic_name</query>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Execution</title>
+      <table>
+        <search base="notable_events">
+          <query>
+            
+| fillnull value="" tactic_name search_name user application destination device
+| stats count values(search_name) dc(user) dc(device) dc(application)  by tactic_name
+| search tactic_name = "Execution"
+| rename values(*) as * dc(*) as dc_*
+| transpose 0 header_field=tactic_name</query>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Persistence</title>
+      <table>
+        <search base="notable_events">
+          <query>
+| fillnull value="" tactic_name search_name user application destination device
+| stats count values(search_name) dc(user) dc(device) dc(application)  by tactic_name
+| search tactic_name = "Persistence"
+| rename values(*) as * dc(*) as dc_*
+| transpose 0 header_field=tactic_name</query>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Privilege Escalation</title>
+      <table>
+        <search base="notable_events">
+          <query>
+| fillnull value="" tactic_name search_name user application destination device
+| stats count values(search_name) dc(user) dc(device) dc(application)  by tactic_name
+| search tactic_name = "Privilege Escalation"
+| rename values(*) as * dc(*) as dc_*
+| transpose 0 header_field=tactic_name</query>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Defense Evasion</title>
+      <table>
+        <search base="notable_events">
+          <query>
+| fillnull value="" tactic_name search_name user application destination device
+| stats count values(search_name) dc(user) dc(device) dc(application)  by tactic_name
+| search tactic_name = "Defense Evasion"
+| rename values(*) as * dc(*) as dc_*
+| transpose 0 header_field=tactic_name</query>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Credential Access</title>
+      <table>
+        <search base="notable_events">
+          <query>
+| fillnull value="" tactic_name search_name user application destination device
+| stats count values(search_name) dc(user) dc(device) dc(application)  by tactic_name
+| search tactic_name = "Credential Access"
+| rename values(*) as * dc(*) as dc_*
+| transpose 0 header_field=tactic_name</query>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Discovery</title>
+      <table>
+        <search base="notable_events">
+          <query>| fillnull value="" tactic_name search_name user application destination device
+| stats count values(search_name) dc(user) dc(device) dc(application)  by tactic_name
+| search tactic_name = "Discovery"
+| rename values(*) as * dc(*) as dc_*
+| transpose 0 header_field=tactic_name</query>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Lateral Movement</title>
+      <table>
+        <search base="notable_events">
+          <query>
+| fillnull value="" tactic_name search_name user application destination device
+| stats count values(search_name) dc(user) dc(device) dc(application)  by tactic_name
+| search tactic_name = "Lateral Movement"
+| rename values(*) as * dc(*) as dc_*
+| transpose 0 header_field=tactic_name</query>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Collection</title>
+      <table>
+        <search base="notable_events">
+          <query>
+| fillnull value="" tactic_name search_name user application destination device
+| stats count values(search_name) dc(user) dc(device) dc(application)  by tactic_name
+| search tactic_name = "Collection      "
+| rename values(*) as * dc(*) as dc_*
+| transpose 0 header_field=tactic_name</query>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Command and Control</title>
+      <table>
+        <search base="notable_events">
+          <query>| fillnull value="" tactic_name search_name user application destination device
+| stats count values(search_name) dc(user) dc(device) dc(application)  by tactic_name
+| search tactic_name = "Command And Control"
+| rename values(*) as * dc(*) as dc_*
+| transpose 0 header_field=tactic_name</query>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Exfiltration</title>
+      <table>
+        <search>
+          <query>index IN(notable risk)
+| rex field=search_name mode=sed "s/CBPSOC - //g"
+| lookup mitre_all_technique_lookup_results.csv rule_name AS search_name
+| rex field=mitre_technique "^(?&lt;technique_id&gt;\S+)"
+| lookup mitre_tt_lookup.csv technique_id
+| eval device = coalesce(dest_host, dest, dvc_dns, dest_ip, src)
+| rex field=file_path "(?&lt;app_1&gt;[^\\\/]+)$$"
+| rex field=child_fullpath "(?&lt;app_2&gt;[^\\\/]+)$$"
+| rex field=parent_fullpath "(?&lt;app_3&gt;[^\\\/]+)$$"
+| eval application = coalesce(app, app_1, app_2, app_3)
+| fillnull value="" tactic_name search_name user application destination device
+| stats count values(search_name) dc(user) dc(device) dc(application)  by tactic_name
+| search tactic_name = "Exfiltration"
+| rename values(*) as * dc(*) as dc_*
+| transpose 0 header_field=tactic_name</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <title>Impact</title>
+      <table>
+        <search base="notable_events">
+          <query>| fillnull value="" tactic_name search_name user application destination device
+| stats count values(search_name) dc(user) dc(device) dc(application)  by tactic_name
+| search tactic_name = "Impact"
+| rename values(*) as * dc(*) as dc_*
+| transpose 0 header_field=tactic_name</query>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>search_name</title>
+      <table>
+        <search base="notable_events">
+          <query>
+| fillnull value="" tactic_name search_name user application device
+| stats count values(tactic_name) values(technique_name) dc(user) dc(device) dc(application)  by search_name
+| rename values(*) as *
+| search search_name = "*"
+| transpose 0 header_field=search_name</query>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="text" token="search_name">
+        <label>search_name</label>
+        <default></default>
+      </input>
+      <table>
+        <title>Events by Search Name</title>
+        <search base="notable_events">
+          <query>
+| fillnull value="" tactic_name search_name user application device
+| stats count values(tactic_name) values(technique_name) values(user) values(device) values(application) values(signature) values(src) values(dest) values(dest_host) values(dest_ip) values(app) values(action) values(parent_fullpath) values(risk) values(alert_description) values(dvc_dns) values(child_fullpath) values(file_create) values(file_hash) values(file_path) values(parent_args) values(system_name) values(session) by search_name
+| rename values(*) as *
+| search search_name = "$search_name$"
+| transpose 0 header_field=search_name</query>
+        </search>
+        <option name="count">40</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <input type="dropdown" token="tactic_name">
+        <label>tactic_name</label>
+        <fieldForLabel>tactic_name</fieldForLabel>
+        <fieldForValue>tactic_name</fieldForValue>
+        <search>
+          <query>| inputlookup mitre_tt_lookup.csv | stats count by tactic_name</query>
+        </search>
+      </input>
+      <table>
+        <title>Events by Tactic</title>
+        <search base="notable_events">
+          <query>
+| fillnull value="" tactic_name search_name user application device
+| stats count values(search_name) values(technique_name) values(user) values(device) values(application) values(signature) values(src) values(dest) values(dest_host) values(dest_ip) values(app) values(action) values(parent_fullpath) values(risk) values(alert_description) values(dvc_dns) values(child_fullpath) values(file_create) values(file_hash) values(file_path) values(parent_args) values(system_name) values(session) by  tactic_name
+| rename values(*) as *
+| search tactic_name = "$tactic_name$"
+| transpose 0 header_field=tactic_name</query>
+        </search>
+        <option name="count">40</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+    <panel>
+      <input type="dropdown" token="technique_name">
+        <label>technique_name</label>
+        <choice value="*">_all</choice>
+        <fieldForLabel>technique_name</fieldForLabel>
+        <fieldForValue>technique_name</fieldForValue>
+        <search>
+          <query>| inputlookup mitre_tt_lookup.csv | stats count by technique_name</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+        </search>
+      </input>
+      <table>
+        <search base="notable_events">
+          <query>
+| fillnull value="" tactic_name search_name user application device technique_name
+| stats count values(search_name) values(tactic_name) values(user) values(device) values(application) values(signature) values(src) values(dest) values(dest_host) values(dest_ip) values(app) values(action) values(parent_fullpath) values(risk) values(alert_description) values(dvc_dns) values(child_fullpath) values(file_create) values(file_hash) values(file_path) values(parent_args) values(system_name) values(session) by technique_name
+| rename values(*) as *
+| search technique_name = "$technique_name$"
+| transpose 0 header_field=technique_name</query>
+        </search>
+        <option name="count">40</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+</form>

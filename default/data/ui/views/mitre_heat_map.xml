@@ -1,0 +1,86 @@
+<form script="mitre_compliance_mg.js" stylesheet="mitre_matrix_mg.css">
+  <label>MITRE Frame Heatmap</label>
+  <fieldset submitButton="true" autoRun="false">
+    <input type="time" token="time">
+      <label>Time Picker</label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="index">
+      <label>index</label>
+      <choice value="notable">notable</choice>
+      <choice value="risk">risk</choice>
+      <choice value="*">_all</choice>
+      <default>*</default>
+      <initialValue>*</initialValue>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>index IN(notable risk)
+| lookup mitre_all_technique_lookup_results.csv rule_name AS search_name
+| rex field=mitre_technique "^(?&lt;technique_id&gt;\S+)"
+| lookup mitre_tt_lookup.csv technique_id
+| fillnull value="" tactic_name technique_name | stats count values(search_name) as search_name by index tactic_name technique_name | mvexpand technique_name
+| search index="*" | outputlookup mitre_notable_event.csv</query>
+          <earliest>$time.earliest$</earliest>
+          <latest>$time.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">5</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <drilldown>
+          <eval token="technique_count">$click.value$</eval>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table id="mitrematrix_mg">
+        <search>
+          <query>| inputlookup mitre_lookup.csv
+| foreach *
+    [| rex field="&lt;&lt;FIELD&gt;&gt;" "(?&lt;technique_temp&gt;.*) \("
+    | eval technique_nogroups=coalesce(technique_temp,'&lt;&lt;FIELD&gt;&gt;')
+    | eval "&lt;&lt;FIELD&gt;&gt; Tactic" = "&lt;&lt;FIELD&gt;&gt;"
+    | lookup mitre_notable_event.csv technique_name AS "technique_nogroups" tactic_name AS "&lt;&lt;FIELD&gt;&gt; Tactic"
+    | eval count=ifnull(count, 0)
+    | eval search_name=ifnull(search_name, "none")
+    | eval "&lt;&lt;FIELD&gt;&gt; count" = count
+    | eval "&lt;&lt;FIELD&gt;&gt; search_name" = search_name
+    | eval text='&lt;&lt;FIELD&gt;&gt;'
+    | eval "&lt;&lt;FIELD&gt;&gt;" = text."|".count."|".search_name
+        ]
+        | fillnull value="" "Initial Access" Execution Persistence "Privilege Escalation"
+"Defense Evasion" "Credential Access" Discovery
+"Lateral Movement" Collection "Command And Control"
+Exfiltration Impact |stats count by "Initial Access" Execution Persistence "Privilege Escalation"
+"Defense Evasion" "Credential Access" Discovery
+"Lateral Movement" Collection "Command And Control"
+Exfiltration Impact row_count | sort row_count</query>
+          <earliest>-24h</earliest>
+          <latest></latest>
+        </search>
+        <option name="count">100</option>
+        <option name="drilldown">cell</option>
+        <option name="refresh.display">progressbar</option>
+        <fields>["Initial Access","Execution","Persistence","Privilege Escalation","Defense Evasion","Credential Access","Discovery","Lateral Movement","Collection","Command And Control","Exfiltration","Impact"]</fields>
+        <drilldown>
+          <eval token="technique_q">mvindex(split('click.value2',"|"),0)</eval>
+          <link target="_blank">/app/DA-ESS-MitreContent/mitre_rule_finder?form.mitre_technique_name=$technique_q$</link>
+        </drilldown>
+      </table>
+    </panel>
+  </row>
+</form>

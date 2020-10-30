@@ -1,0 +1,10 @@
+<nav search_view="search">
+  <view name="mitre_heat_map" default="true" />
+  <view name="mitre_configurator" />
+  <view name="mitre_framework_details" />
+    <collection label="Search">
+    <view name="reports" />
+    <view name="search" />
+    <view name="dashboards" />
+  </collection>
+</nav>

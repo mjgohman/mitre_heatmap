@@ -1,0 +1,93 @@
+description,"rule_name","tactic_id","tactic_name","technique_id","technique_name",domain,"rule_name_short",app,displayapp
+"Detects user and computer account deletion","Access - Account Deleted - Rule","
+TA0005","Defense Evasion","
+T1070","Indicator Removal on Host","Access ","Account Deleted","Splunk_App_for_Enterprise_Security","Splunk App for Enterprise Security"
+,"Access - Concurrent App Accesses - Rule",,,,,"Access ","Concurrent App Accesses",,
+"Alerts on access attempts that are improbable based on time and geography.","Access - Geographically Improbable Access Detected - Rule","
+TA0001
+TA0004","Initial Access
+Privilege Escalation","
+T1078","Valid Accounts","Access ","Geographically Improbable Access Detected","Splunk_App_for_Enterprise_Security","Splunk App for Enterprise Security"
+"Detects users with a high or critical priority logging into a malware infected machine","Access - High or Critical Priority Individual Logging into Infected Machine - Rule","
+TA0004
+TA0001","Privilege Escalation
+Initial Access","
+T1078","Valid Accounts","Access ","High or Critical Priority Individual Logging into Infected Machine","Splunk_App_for_Enterprise_Security","Splunk App for Enterprise Security"
+,"Access - Short-lived Account Detected - Rule",,,,,"Access ",Short,,
+"Detects an abnormally high number of endpoint changes by user account, as they relate to restarts, audits, filesystem, user, and registry modifications.","Change - Abnormally High Number of Endpoint Changes By User - Rule","
+TA0003
+TA0005","Persistence
+Defense Evasion","
+T1031
+T1112
+T1222","Modify Existing Service
+Modify Registry
+File and Directory Permissions Modification","Change ","Abnormally High Number of Endpoint Changes By User","Splunk_App_for_Enterprise_Security","Splunk App for Enterprise Security"
+"Alerts a series of hosts begin listening on a new port within 24 hours. This may be an indication that the devices have been compromised or have had new (and potentially vulnerable) software installed.","Endpoint - Anomalous New Listening Port - Rule","
+TA0011","Command and Control","
+T1065
+T1043","Uncommonly Used Port
+Commonly Used Port","Endpoint ","Anomalous New Listening Port","Splunk_App_for_Enterprise_Security","Splunk App for Enterprise Security"
+,"Endpoint - Anomalous User Account Creation - Rule",,,,,"Endpoint ","Anomalous User Account Creation",,
+"Alerts when a high number of hosts not updating malware signatures have been discovered.  These hosts should be evaluated to determine why they are not updating their malware signatures.","Endpoint - High Number of Hosts Not Updating Malware Signatures - Rule","
+TA0005","Defense Evasion","
+T1089","Disabling Security Tools","Endpoint ","High Number of Hosts Not Updating Malware Signatures","Splunk_App_for_Enterprise_Security","Splunk App for Enterprise Security"
+"Alerts when a high total number of infected hosts is discovered.","Endpoint - High Number Of Infected Hosts - Rule",None,None,None,None,"Endpoint ","High Number Of Infected Hosts","Splunk_App_for_Enterprise_Security","Splunk App for Enterprise Security"
+,"Endpoint - High Or Critical Priority Host With Malware - Rule",,,,,"Endpoint ","High Or Critical Priority Host With Malware",,
+"Alerts when an host not designated as an e-mail server sends excessive e-mail to one or more target hosts.","Endpoint - Host Sending Excessive Email - Rule","
+TA0001","Initial Access","
+T1193
+T1192","Spearphishing Attachment
+Spearphishing Link","Endpoint ","Host Sending Excessive Email","Splunk_App_for_Enterprise_Security","Splunk App for Enterprise Security"
+,"Endpoint - Host With Excessive Number Of Listening Ports - Rule",,,,,"Endpoint ","Host With Excessive Number Of Listening Ports",,
+,"Endpoint - Host With Excessive Number Of Processes - Rule",,,,,"Endpoint ","Host With Excessive Number Of Processes",,
+,"Endpoint - Host With Excessive Number Of Services - Rule",,,,,"Endpoint ","Host With Excessive Number Of Services",,
+"Alerts when a host with multiple infections is discovered.","Endpoint - Host With Multiple Infections - Rule","
+TA0001
+TA0002","Initial Access
+Execution","
+T1189
+T1193
+T1192
+T1204","Drive-by Compromise
+Spearphishing Attachment
+Spearphishing Link
+User Execution","Endpoint ","Host With Multiple Infections","Splunk_App_for_Enterprise_Security","Splunk App for Enterprise Security"
+,"Endpoint - Old Malware Infection - Rule",,,,,"Endpoint ","Old Malware Infection",,
+"Alerts when an event is discovered from a user associated with identity that is now expired (that is, the end date of the identity has been passed).","Identity - Activity from Expired User Identity - Rule","
+TA0001
+TA0003","Initial Access
+Persistence","
+T1078","Valid Accounts","Identity ","Activity from Expired User Identity","Splunk_App_for_Enterprise_Security","Splunk App for Enterprise Security"
+,"Identity - High Volume Email Activity with Non-corporate Domains - Rule",,,,,"Identity ","High Volume Email Activity with Non",,
+"Mike Test","Identity - mike_test - Rule",TA0001,"Initial Access","T1199
+T1193","Trusted Relationship
+Spearphishing Attachment","Identity ","mike_test",custom,"Custom Content"
+,"Identity - Web Uploads to Non-corporate Domains - Rule",,,,,"Identity ","Web Uploads to Non",,
+"This search identifies DNS query failures by counting the number of DNS responses that do not indicate success, and trigger on more than 50 occurrences.","Network - Excessive DNS Failures - Rule","TA0010
+TA0011","Exfiltration
+Command and Control","T1048
+T1043","Exfiltration Over Alternative Protocol
+Commonly Used Port","Network ","Excessive DNS Failures","Enterprise_Security_Content_Update","Enterprise Security Content Update"
+"Alerts when a host starts sending excessive DNS queries","Network - Excessive DNS Queries - Rule","
+TA0011","Command and Control","
+T1071","Standard Application Layer Protocol","Network ","Excessive DNS Queries","Splunk_App_for_Enterprise_Security","Splunk App for Enterprise Security"
+"Alerts when a host generates a lot of HTTP failures in a short span of time","Network - Excessive HTTP Failure Responses - Rule","
+TA0001
+TA0006","Initial Access
+Credential Access","
+T1190
+T1110","Exploit Public-Facing Application
+Brute Force","Network ","Excessive HTTP Failure Responses","Splunk_App_for_Enterprise_Security","Splunk App for Enterprise Security"
+,"Network - High Volume of Traffic from High or Critical Host - Rule",,,,,"Network ","High Volume of Traffic from High or Critical Host",,
+,"Network - Unapproved Port Activity Detected - Rule",,,,,"Network ","Unapproved Port Activity Detected",,
+,"Network - Unroutable Host Activity - Rule",,,,,"Network ","Unroutable Host Activity",,
+"Detects unusual network traffic that may be indicative of a DoS attack as indicated by a high number of unique sources or a high volume of firewall packets","Network - Unusual Volume of Network Activity - Rule",None,None,None,None,"Network ","Unusual Volume of Network Activity","Splunk_App_for_Enterprise_Security","Splunk App for Enterprise Security"
+,"Threat - Threat List Activity - Rule",,,,,"Threat ","Threat List Activity",,
+"Alerts when a host has an abnormally high number of HTTP requests by http method.","Web - Abnormally High Number of HTTP Method Events By Src - Rule","
+TA0001
+TA0006","Initial Access
+Credential Access","
+T1190
+T1110","Exploit Public-Facing Application
+Brute Force","Web ","Abnormally High Number of HTTP Method Events By Src","Splunk_App_for_Enterprise_Security","Splunk App for Enterprise Security"

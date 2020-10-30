@@ -1,0 +1,163 @@
+<form>
+  <label>Configure Mitre Techniques</label>
+  <fieldset submitButton="false" autoRun="false"></fieldset>
+  <row>
+    <panel>
+      <input type="dropdown" token="csearch_name" searchWhenChanged="true">
+        <label>csearch_name</label>
+        <fieldForLabel>csearch_name</fieldForLabel>
+        <fieldForValue>csearch_name</fieldForValue>
+        <search>
+          <query>| rest splunk_server=local count=0 /services/saved/searches
+| search action.correlationsearch.enabled = 1
+| rename eai:acl.app as app, title as csearch_name, action.correlationsearch.label as csearch_label, action.notable.param.security_domain as security_domain  | stats count by csearch_name</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+      </input>
+      <input type="multiselect" token="technique" searchWhenChanged="true">
+        <label>technique</label>
+        <fieldForLabel>technique</fieldForLabel>
+        <fieldForValue>technique</fieldForValue>
+        <search>
+          <query>| inputlookup mitre_tt_lookup_combined.csv  |  stats count by technique</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <delimiter> ,</delimiter>
+      </input>
+      <table>
+        <search>
+          <query>| rest splunk_server=local count=0 /services/saved/searches
+| search action.correlationsearch.enabled = 1
+| rename eai:acl.app as app, title as csearch_name, action.correlationsearch.label as csearch_label, action.notable.param.security_domain as security_domain
+| table csearch_name, csearch_label, app, security_domain, description actions
+| lookup mitre_all_rule_technique_lookup_sse.csv rule_name as csearch_name
+| table csearch_name description technique_id
+| search csearch_name ="$csearch_name$"
+| eval csearch_name_1 = csearch_name
+| rex field=csearch_name_1 mode=sed "s/(\()/\(/g"
+| rex field=csearch_name_1 mode=sed "s/(\))/\)/g"
+| eval technique = case(
+(match((csearch_name), csearch_name_1)), "$technique$", (1==1),technique)
+| makemv delim=" ," technique | mvexpand technique
+| lookup mitre_tt_lookup_combined.csv technique
+| table csearch_name description technique_id technique_name tactic_id tactic_name
+| fillnull value=""  csearch_name description technique_id technique_name tactic_id tactic_name
+| stats count by  csearch_name description technique_id technique_name tactic_id tactic_name
+| rename values(*) as *
+| outputlookup tempmitreconfig.csv
+| eval run_query = "| inputlookup tempmitreconfig.csv | rename csearch_name AS rule_name | fields - description count | outputlookup mitre_all_technique_lookup_results.csv append=true"
+| table run_query csearch_name description technique_id technique_name tactic_id tactic_name</query>
+          <earliest>1598882400.000</earliest>
+          <latest>1598970818.000</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">cell</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <drilldown>
+          <set token="run_query">$click.value$</set>
+          <link target="_blank">search?q=$run_query$ &amp;earliest=-4h@m&amp;latest=now</link>
+        </drilldown>
+      </table>
+    </panel>
+    <panel>
+      <input type="dropdown" token="csearch_name_1">
+        <label>Search Name</label>
+        <choice value="*">_all</choice>
+        <default>*</default>
+        <initialValue>*</initialValue>
+        <fieldForLabel>csearch_name</fieldForLabel>
+        <fieldForValue>csearch_name</fieldForValue>
+        <search>
+          <query>| rest splunk_server=local count=0 /services/saved/searches
+| search action.correlationsearch.enabled = 1
+| rename eai:acl.app as app, title as csearch_name, action.correlationsearch.label as csearch_label, action.notable.param.security_domain as security_domain  | stats count by csearch_name</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+      </input>
+      <table>
+        <search>
+          <query>| rest splunk_server=local count=0 /services/saved/searches
+| search action.correlationsearch.enabled = 1
+| rename eai:acl.app as app, title as csearch_name, action.correlationsearch.label as csearch_label, action.notable.param.security_domain as security_domain
+| table csearch_name, csearch_label, app, security_domain, description actions
+| lookup mitre_all_rule_technique_lookup_sse.csv rule_name as csearch_name
+| table csearch_name technique_id description
+| sort csearch_name
+| search csearch_name = "$csearch_name_1$"</query>
+          <earliest>1598882400.000</earliest>
+          <latest>1598970818.000</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">5</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <title>Results</title>
+        <search>
+          <query>| inputlookup mitre_all_technique_lookup_results.csv</query>
+          <earliest>0</earliest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <table>
+        <search>
+          <query>| inputlookup mitre_framework_cbp.csv
+| table
+    "Initial Access"
+    "Execution"
+    Persistence
+    "Privilege Escalation"
+    "Defense Evasion"
+    "Credential Access"
+    "Discovery"
+    "Lateral Movement"
+    Collection
+    "Command And Control"
+    Exfiltration
+    Impact
+    | outputlookup mitre_framework_cbp.csv</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+</form>
