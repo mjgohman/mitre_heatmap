@@ -5,7 +5,6 @@ require.config({
   }
 });
 
-
 require([
     'underscore',
     'jquery',
@@ -38,19 +37,18 @@ require([
 
             if (technique_count != "NULL") {
                 technique_count =  parseFloat(technique_count);
-                if(technique_count > 20){
+                if(technique_count => 20){
                     $td.addClass('range-cell').addClass('range-compliance_high');
                 }
-	        if(technique_count > 10){
+	            if(technique_count => 10){
                     $td.addClass('range-cell').addClass('range-compliance_mid');
+                }
+                if(technique_count => 1){
+                    $td.addClass('range-cell').addClass('range-compliance_low');
                 }
                 if(technique_count = 0){
                     $td.addClass('range-cell').addClass('range-compliance_zero');
                 }
-                if(technique_count > 0){
-                    $td.addClass('range-cell').addClass('range-compliance_low');
-                }
-
             }
             else if(technique_count == "NULL"){
                 $td.addClass('range-cell').addClass('range-none');
